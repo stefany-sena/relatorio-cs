@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Repasse — Análise Acumulativa (Maio–Junho 2026) · 77Sol</title>
+
+  <!-- Tipografia premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Biblioteca de gráficos -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+  <style>
+    /* =================================================================
+       DESIGN SYSTEM — Paleta oficial 77Sol
+       (Sol #FBCF31 reservado apenas para pequenos destaques/CTAs)
+       ================================================================= */
+    :root {
+      /* Marca */
+      --azul77:        #026BFF;
+      --azul77-600:    #0052CC;
+      --azul-escuro:   #060C54;
+      --azul-celeste:  #7FBFFA;
+      --azul-ceu:      #C4E1FF;
+      --gelo:          #EBF2FF;
+      --sol:           #FBCF31;
+      --branco:        #FFFFFF;
+
+      /* Neutros / semânticos */
+      --tinta:         #0B1437;
+      --cinza-texto:   #5A6781;
+      --cinza-suave:   #8A95AD;
+      --cinza-borda:   #E6ECF5;
+      --cinza-borda-2: #EFF3FA;
+      --vermelho:      #E5484D;
+      --verde:         #2F9E61;
+      --laranja:       #E8870B;
+      --roxo:          #7C5CDB;
+
+      /* Superfícies */
+      --bg:            #F5F8FE;
+      --surface:       #FFFFFF;
+
+      /* Sombras premium (azuladas, suaves) */
+      --sh-xs: 0 1px 2px rgba(6,12,84,.05);
+      --sh-sm: 0 2px 8px rgba(6,12,84,.06);
+      --sh-md: 0 8px 24px rgba(6,12,84,.08);
+      --sh-lg: 0 18px 50px rgba(6,12,84,.12);
+
+      --radius:    18px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+
+      --maxw: 1180px;
+      --ease: cubic-bezier(.16,.84,.44,1);
+    }
+
+    /* =================================================================
+       RESET & BASE
+       ================================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 100% -200px, rgba(2,107,255,.06), transparent 60%),
+        radial-gradient(900px 500px at -100px 200px, rgba(127,191,250,.10), transparent 55%),
+        var(--bg);
+      color: var(--tinta);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: inherit; }
+
+    ::selection { background: var(--azul-ceu); color: var(--azul-escuro); }
+
+    /* Scrollbar discreta */
+    ::-webkit-scrollbar { width: 11px; height: 11px; }
+    ::-webkit-scrollbar-thumb { background: #cdd9ec; border-radius: 20px; border: 3px solid var(--bg); }
+    ::-webkit-scrollbar-thumb:hover { background: #b6c5e0; }
+
+    .wrap {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 28px clamp(16px, 4vw, 40px) 72px;
+    }
+
+    h1, h2, h3, h4 { color: var(--azul-escuro); letter-spacing: -.012em; }
+
+    /* =================================================================
+       BARRA DE PROGRESSO DE LEITURA
+       ================================================================= */
+    .progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--azul77), var(--azul-celeste));
+      z-index: 100;
+      transition: width .1s linear;
+    }
+
+    /* =================================================================
+       NAVEGAÇÃO FIXA
+       ================================================================= */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 90;
+      background: rgba(255,255,255,.72);
+      backdrop-filter: saturate(180%) blur(14px);
+      -webkit-backdrop-filter: saturate(180%) blur(14px);
+      border-bottom: 1px solid var(--cinza-borda);
+    }
+
+    .nav-inner {
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 12px clamp(16px, 4vw, 40px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+
+    .nav-logo {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--azul77), var(--azul-escuro));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .92rem; color: #fff;
+      box-shadow: var(--sh-sm);
+    }
+
+    .nav-brand b { font-size: .98rem; font-weight: 800; color: var(--azul-escuro); }
+    .nav-brand span { display: block; font-size: .68rem; color: var(--cinza-suave); font-weight: 500; }
+
+    .nav-links { display: flex; gap: 4px; }
+
+    .nav-links a {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--cinza-texto);
+      text-decoration: none;
+      padding: 8px 13px;
+      border-radius: 9px;
+      transition: all .2s var(--ease);
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { background: var(--gelo); color: var(--azul77); }
+    .nav-links a.active { background: var(--azul77); color: #fff; box-shadow: var(--sh-sm); }
+
+    .nav-toggle { display: none; background: none; border: 0; cursor: pointer; padding: 6px; }
+    .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--azul-escuro); margin: 4px 0; border-radius: 2px; }
+
+    @media (max-width: 880px) {
+      .nav-links {
+        position: absolute; top: 100%; left: 0; right: 0;
+        flex-direction: column;
+        background: #fff;
+        padding: 10px;
+        border-bottom: 1px solid var(--cinza-borda);
+        box-shadow: var(--sh-md);
+        display: none;
+      }
+      .nav-links.open { display: flex; }
+      .nav-toggle { display: block; }
+    }
+
+    /* =================================================================
+       REVEAL ON SCROLL
+       ================================================================= */
+    .reveal { opacity: 0; transform: translateY(22px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      html { scroll-behavior: auto; }
+    }
+
+    /* =================================================================
+       SEÇÕES
+       ================================================================= */
+    .section { margin-top: 64px; scroll-margin-top: 92px; }
+
+    .section-head { margin-bottom: 22px; }
+
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      color: var(--azul77);
+      background: var(--gelo);
+      padding: 5px 11px; border-radius: 20px;
+      margin-bottom: 12px;
+    }
+    .eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--azul77); }
+
+    .section h2 { font-size: clamp(1.35rem, 2.4vw, 1.7rem); font-weight: 800; }
+    .section-sub { color: var(--cinza-texto); margin-top: 6px; max-width: 720px; font-size: .92rem; }
+
+    /* =================================================================
+       HERO / CABEÇALHO EXECUTIVO
+       ================================================================= */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      padding: clamp(28px, 4vw, 52px);
+      color: #fff;
+      background:
+        radial-gradient(800px 400px at 88% -40%, rgba(2,107,255,.55), transparent 60%),
+        radial-gradient(600px 360px at -10% 120%, rgba(127,191,250,.28), transparent 60%),
+        linear-gradient(135deg, #0a1170 0%, var(--azul-escuro) 60%, #04083a 100%);
+      box-shadow: var(--sh-lg);
+      margin-top: 22px;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+      background-size: 22px 22px;
+      mask-image: linear-gradient(135deg, rgba(0,0,0,.5), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero > * { position: relative; z-index: 1; }
+
+    .hero-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 30px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--sol);
+      color: var(--azul-escuro);
+      font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
+      padding: 7px 14px; border-radius: 30px;
+      box-shadow: 0 6px 18px rgba(251,207,49,.35);
+    }
+    .hero-badge .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--vermelho); box-shadow: 0 0 0 0 rgba(229,72,77,.6); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(229,72,77,.55);} 70%{box-shadow:0 0 0 9px rgba(229,72,77,0);} 100%{box-shadow:0 0 0 0 rgba(229,72,77,0);} }
+
+    .hero-eyebrow { font-size: .74rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--azul-celeste); margin-bottom: 14px; }
+
+    .hero h1 { color: #fff; font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 900; line-height: 1.12; }
+
+    .hero-desc { color: rgba(255,255,255,.82); margin-top: 14px; max-width: 640px; font-size: 1rem; }
+    .hero-desc b { color: #fff; }
+
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .hero-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(6px);
+      padding: 9px 14px; border-radius: 12px;
+      font-size: .82rem; color: rgba(255,255,255,.78);
+    }
+    .hero-chip b { color: #fff; font-weight: 700; }
+    .hero-chip .ic { font-size: .95rem; }
+
+    /* =================================================================
+       KPIs
+       ================================================================= */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+    }
+
+    .kpi {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--sh-sm);
+      overflow: hidden;
+      transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .kpi:hover { transform: translateY(-4px); box-shadow: var(--sh-md); }
+
+    .kpi::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, var(--azul77), var(--azul-celeste));
+    }
+    .kpi.is-alert::before { background: linear-gradient(90deg, var(--vermelho), #ff8a8d); }
+    .kpi.is-good::before  { background: linear-gradient(90deg, var(--verde), #6fd49b); }
+
+    .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .kpi-label { font-size: .76rem; font-weight: 700; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: .05em; }
+
+    .kpi-ic {
+      width: 38px; height: 38px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem;
+      background: var(--gelo); color: var(--azul77);
+    }
+    .kpi.is-alert .kpi-ic { background: #FEECEC; color: var(--vermelho); }
+    .kpi.is-good .kpi-ic  { background: #E7F6EE; color: var(--verde); }
+
+    .kpi-value { font-size: 2.5rem; font-weight: 900; color: var(--azul-escuro); line-height: 1; letter-spacing: -.03em; }
+    .kpi-value .suffix { font-size: 1.1rem; font-weight: 800; color: var(--cinza-suave); margin-left: 2px; }
+
+    .kpi-delta { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 700; margin-top: 12px; padding: 4px 10px; border-radius: 20px; }
+    .kpi-delta.up   { color: var(--vermelho); background: #FEECEC; }
+    .kpi-delta.down { color: var(--verde);   background: #E7F6EE; }
+    .kpi-delta.flat { color: var(--cinza-texto); background: var(--gelo); }
+
+    .kpi-sub { font-size: .76rem; color: var(--cinza-suave); margin-top: 10px; }
+
+    /* =================================================================
+       CARDS
+       ================================================================= */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius);
+      padding: clamp(22px, 3vw, 30px);
+      box-shadow: var(--sh-sm);
+    }
+    .card + .card { margin-top: 20px; }
+    .card-title { font-size: 1.08rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+    .card-title .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 30px; height: 30px; padding: 0 9px;
+      background: var(--azul-escuro); color: #fff; font-size: .76rem; font-weight: 800;
+      border-radius: 9px;
+    }
+    .card-desc { color: var(--cinza-texto); font-size: .9rem; margin-top: 8px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media (max-width: 760px) { .two-col { grid-template-columns: 1fr; } }
+
+    .chart-box { position: relative; height: 300px; margin-top: 20px; }
+    .chart-box.sm { height: 250px; }
+
+    /* =================================================================
+       TABELA DE DISTRIBUIÇÃO COMPARATIVA
+       ================================================================= */
+    .table-scroll { overflow-x: auto; margin-top: 22px; border-radius: var(--radius-md); }
+
+    .dist-table { width: 100%; border-collapse: collapse; font-size: .9rem; min-width: 560px; }
+    .dist-table th {
+      text-align: left; font-size: .68rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase;
+      color: var(--cinza-suave); padding: 0 14px 12px; border-bottom: 2px solid var(--cinza-borda);
+    }
+    .dist-table td { padding: 13px 14px; border-bottom: 1px solid var(--cinza-borda-2); vertical-align: middle; }
+    .dist-table tr:last-child td { border-bottom: none; }
+    .dist-table tbody tr { transition: background .2s; }
+    .dist-table tbody tr:hover { background: var(--gelo); }
+    .dist-cat { font-weight: 600; color: var(--tinta); }
+    .dist-num { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--azul-escuro); }
+
+    .bar-track { background: var(--cinza-borda); border-radius: 6px; height: 9px; overflow: hidden; min-width: 90px; }
+    .bar-fill { height: 100%; border-radius: 6px; width: 0; transition: width 1s var(--ease); }
+    .bar-fill.mai { background: linear-gradient(90deg, var(--azul-celeste), #5fa9f0); }
+    .bar-fill.jun { background: linear-gradient(90deg, var(--azul77), var(--azul-escuro)); }
+
+    .pill { font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+    .pill.up   { background: #FEECEC; color: var(--vermelho); }
+    .pill.down { background: #E7F6EE; color: var(--verde); }
+    .pill.ok   { background: #E7F6EE; color: var(--verde); }
+    .pill.na   { background: var(--gelo); color: var(--cinza-suave); }
+
+    /* =================================================================
+       SHIFT DE COMPORTAMENTO
+       ================================================================= */
+    .shift-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; margin-top: 22px; }
+
+    .shift {
+      border-radius: var(--radius-md);
+      padding: 22px;
+      border: 1px solid var(--cinza-borda);
+    }
+    .shift.mai { background: linear-gradient(180deg,#FFFBF0,#fff); border-left: 4px solid var(--laranja); }
+    .shift.jun { background: linear-gradient(180deg,#EFF5FF,#fff); border-left: 4px solid var(--azul77); }
+
+    .shift-tag { font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+    .shift.mai .shift-tag { color: var(--laranja); }
+    .shift.jun .shift-tag { color: var(--azul77); }
+    .shift-quote { font-size: 1rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 14px; line-height: 1.3; }
+    .shift li { list-style: none; font-size: .84rem; color: var(--cinza-texto); padding: 5px 0 5px 20px; position: relative; }
+    .shift li::before { content: '→'; position: absolute; left: 0; color: var(--azul-celeste); font-weight: 700; }
+    .shift li b { color: var(--azul-escuro); }
+
+    .shift-arrow {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      color: var(--azul77);
+    }
+    .shift-arrow .circle {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--azul77); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+      box-shadow: 0 8px 20px rgba(2,107,255,.35);
+    }
+    .shift-arrow .lbl { font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+
+    @media (max-width: 760px) {
+      .shift-grid { grid-template-columns: 1fr; }
+      .shift-arrow { flex-direction: row; }
+      .shift-arrow .circle { transform: rotate(90deg); }
+    }
+
+    .insight {
+      display: flex; gap: 14px; align-items: flex-start;
+      background: linear-gradient(135deg, var(--gelo), #fff);
+      border: 1px solid var(--azul-ceu);
+      border-radius: var(--radius-md);
+      padding: 18px 20px; margin-top: 22px;
+    }
+    .insight .ic { font-size: 1.4rem; line-height: 1; }
+    .insight p { font-size: .9rem; color: var(--cinza-texto); }
+    .insight b { color: var(--azul-escuro); }
+
+    /* =================================================================
+       HIPÓTESES (CAUSA RAIZ)
+       ================================================================= */
+    .hyp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; margin-top: 22px; }
+    .hyp {
+      background: var(--surface);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      border-top: 3px solid var(--vermelho);
+      transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+    }
+    .hyp:hover { transform: translateY(-3px); box-shadow: var(--sh-md); }
+    .hyp-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .hyp-badge {
+      width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+      background: #FEECEC; color: var(--vermelho);
+      display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: .9rem;
+    }
+    .hyp h3 { font-size: .92rem; font-weight: 800; line-height: 1.3; }
+    .hyp li { list-style: none; font-size: .82rem; color: var(--cinza-texto); padding: 4px 0 4px 16px; position: relative; }
+    .hyp li::before { content: ''; position: absolute; left: 0; top: 11px; width: 6px; height: 6px; border-radius: 50%; background: var(--azul-celeste); }
+    .hyp li b { color: var(--azul-escuro); }
+
+    /* =================================================================
+       TABELA DE CASOS (FILTRÁVEL)
+       ================================================================= */
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: .76rem; font-weight: 700; padding: 7px 14px; border-radius: 30px;
+      border: 1px solid var(--cinza-borda); background: #fff; color: var(--cinza-texto);
+      cursor: pointer; transition: all .2s var(--ease);
+    }
+    .chip:hover { border-color: var(--azul-celeste); color: var(--azul77); }
+    .chip.active { background: var(--azul77); border-color: var(--azul77); color: #fff; box-shadow: var(--sh-sm); }
+
+    .search-box { position: relative; margin-left: auto; }
+    .search-box input {
+      font-family: inherit; font-size: .84rem;
+      padding: 8px 14px 8px 34px;
+      border: 1px solid var(--cinza-borda); border-radius: 30px;
+      width: 220px; max-width: 100%; outline: none; color: var(--tinta);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-box input:focus { border-color: var(--azul77); box-shadow: 0 0 0 3px rgba(2,107,255,.12); }
+    .search-box::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: .8rem; opacity: .6; }
+
+    .cases { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+
+    .case {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), opacity .3s, max-height .35s var(--ease);
+    }
+    .case:hover { transform: translateY(-2px); box-shadow: var(--sh-md); }
+    .case.hide { display: none; }
+
+    .case-mark {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul77), var(--azul-escuro)); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .95rem;
+    }
+    .case-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .case-name { font-weight: 800; color: var(--azul-escuro); font-size: .95rem; }
+    .case-id { font-size: .74rem; color: var(--cinza-suave); }
+    .case-quote {
+      background: var(--gelo); border-left: 3px solid var(--azul77);
+      padding: 10px 14px; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-style: italic; font-size: .86rem; color: var(--azul-escuro); margin: 4px 0 10px;
+    }
+    .case-impact { font-size: .82rem; color: var(--cinza-texto); }
+    .case-impact b { color: var(--tinta); }
+
+    .tag { display: inline-block; font-size: .68rem; font-weight: 700; padding: 4px 11px; border-radius: 20px; }
+    .tag.bug  { background: #FEECEC; color: var(--vermelho); }
+    .tag.conf { background: var(--gelo); color: var(--azul77); }
+    .tag.nf   { background: #FFF6E8; color: var(--laranja); }
+    .tag.com  { background: #E7F6EE; color: var(--verde); }
+    .tag.sla  { background: #F3EEFE; color: var(--roxo); }
+
+    .empty-state { text-align: center; padding: 32px; color: var(--cinza-suave); font-size: .88rem; display: none; }
+    .empty-state.show { display: block; }
+
+    /* =================================================================
+       IMPACTO NO CS
+       ================================================================= */
+    .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px,1fr)); gap: 16px; margin-top: 22px; }
+    .impact {
+      text-align: center; padding: 26px 18px;
+      background: linear-gradient(180deg, var(--gelo), #fff);
+      border: 1px solid var(--cinza-borda); border-radius: var(--radius-md);
+    }
+    .impact-val { font-size: 2.1rem; font-weight: 900; color: var(--azul77); letter-spacing: -.02em; }
+    .impact-desc { font-size: .82rem; color: var(--cinza-texto); margin-top: 6px; }
+
+    /* =================================================================
+       AÇÕES PROPOSTAS
+       ================================================================= */
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 16px; font-size: .78rem; color: var(--cinza-texto); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot.alta { background: var(--vermelho); }
+    .dot.media { background: var(--laranja); }
+    .dot.baixa { background: var(--verde); }
+
+    .actions { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+    .action {
+      display: grid; grid-template-columns: 92px 1fr; gap: 18px;
+      background: var(--surface); border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius-md); padding: 20px;
+      border-left: 4px solid var(--cinza-borda);
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+    }
+    .action:hover { transform: translateX(3px); box-shadow: var(--sh-md); }
+    .action.alta  { border-left-color: var(--vermelho); }
+    .action.media { border-left-color: var(--laranja); }
+    .action.baixa { border-left-color: var(--verde); }
+
+    .action-side { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .prio { font-size: .64rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+    .action.alta  .prio { background: #FEECEC; color: var(--vermelho); }
+    .action.media .prio { background: #FFF6E8; color: var(--laranja); }
+    .action.baixa .prio { background: #E7F6EE; color: var(--verde); }
+    .action-code { font-size: 1.15rem; font-weight: 900; color: var(--azul-escuro); }
+
+    .action h3 { font-size: .98rem; font-weight: 800; margin-bottom: 6px; }
+    .action p { font-size: .86rem; color: var(--cinza-texto); }
+    .action-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .meta-tag { font-size: .72rem; font-weight: 600; padding: 4px 11px; border-radius: 20px; background: var(--gelo); color: var(--cinza-texto); }
+    .meta-tag.impact { background: #EAF1FF; color: var(--azul77); }
+    .meta-tag.effort { background: #E7F6EE; color: var(--verde); }
+
+    @media (max-width: 620px) {
+      .action { grid-template-columns: 1fr; }
+      .action-side { flex-direction: row; align-items: center; }
+    }
+
+    /* Mockup UX */
+    .mockup-wrap {
+      margin-top: 22px;
+      background:
+        repeating-linear-gradient(45deg, transparent, transparent 9px, rgba(2,107,255,.025) 9px, rgba(2,107,255,.025) 18px),
+        var(--gelo);
+      border: 1px dashed var(--azul-celeste);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+    .mockup-label { font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--azul77); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .mockup {
+      background: #fff; border: 1px solid var(--cinza-borda); border-radius: var(--radius-md);
+      padding: 20px 22px; max-width: 430px; box-shadow: var(--sh-md);
+    }
+    .mockup-title { font-size: .92rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 14px; }
+    .mockup-status { display: inline-flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 700; color: var(--laranja); background: #FFF6E8; padding: 6px 12px; border-radius: 8px; margin-bottom: 14px; }
+    .mockup-falta { font-size: .82rem; color: var(--cinza-texto); margin-bottom: 6px; }
+    .mockup-falta b { color: var(--azul-escuro); }
+    .mockup-falta ul { margin: 6px 0 0 18px; }
+    .mockup-falta li { padding: 2px 0; }
+    .mockup-cta {
+      display: inline-block; background: var(--azul77); color: #fff; font-size: .84rem; font-weight: 700;
+      padding: 9px 18px; border-radius: 8px; text-decoration: none; margin-top: 14px;
+      box-shadow: 0 6px 16px rgba(2,107,255,.3); transition: transform .2s;
+    }
+    .mockup-cta:hover { transform: translateY(-2px); }
+    .mockup-prazo { font-size: .76rem; color: var(--cinza-suave); margin-top: 12px; }
+
+    /* =================================================================
+       MONITORAMENTO
+       ================================================================= */
+    .monit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 16px; margin-top: 22px; }
+    .monit {
+      background: var(--surface); border: 1px solid var(--cinza-borda);
+      border-radius: var(--radius-md); padding: 20px;
+    }
+    .monit-name { font-size: .86rem; font-weight: 800; color: var(--azul-escuro); margin-bottom: 8px; }
+    .monit-goal { font-size: .78rem; font-weight: 700; color: var(--verde); display: inline-flex; align-items: center; gap: 5px; }
+    .monit-now { font-size: .76rem; color: var(--cinza-suave); margin-top: 6px; font-variant-numeric: tabular-nums; }
+
+    .next {
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+      margin-top: 20px; padding: 26px 30px; border-radius: var(--radius);
+      background:
+        radial-gradient(500px 200px at 100% 0%, rgba(127,191,250,.35), transparent 60%),
+        linear-gradient(135deg, var(--azul77), var(--azul77-600));
+      color: #fff; box-shadow: var(--sh-lg);
+    }
+    .next h3 { color: #fff; font-size: 1.05rem; }
+    .next p { color: rgba(255,255,255,.85); font-size: .86rem; margin-top: 4px; }
+    .next-date { text-align: right; }
+    .next-date .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.7); }
+    .next-date .val { font-size: 1.6rem; font-weight: 900; color: var(--sol); }
+
+    /* =================================================================
+       RODAPÉ
+       ================================================================= */
+    .footer { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--cinza-borda); text-align: center; }
+    .footer p { font-size: .78rem; color: var(--cinza-suave); }
+    .footer b { color: var(--azul-escuro); }
+    .footer .meta2 { font-size: .72rem; margin-top: 6px; }
+
+    /* =================================================================
+       BOTÃO VOLTAR AO TOPO
+       ================================================================= */
+    .to-top {
+      position: fixed; bottom: 26px; right: 26px; z-index: 80;
+      width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+      background: var(--azul-escuro); color: #fff; font-size: 1.1rem;
+      box-shadow: var(--sh-lg);
+      opacity: 0; transform: translateY(14px) scale(.9); pointer-events: none;
+      transition: all .3s var(--ease);
+    }
+    .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+    .to-top:hover { background: var(--azul77); }
+
+    /* =================================================================
+       IMPRESSÃO
+       ================================================================= */
+    @media print {
+      .navbar, .to-top, .progress-bar, .filters { display: none !important; }
+      body { background: #fff; }
+      .card, .kpi, .hyp, .case, .action { box-shadow: none; break-inside: avoid; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de progresso de leitura -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ===================== NAVEGAÇÃO FIXA ===================== -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">77</div>
+        <div>
+          <b>77Sol</b>
+          <span>Customer Success · Análise N2</span>
+        </div>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="#kpis">Métricas</a>
+        <a href="#diagnostico">Diagnóstico</a>
+        <a href="#impacto">Impacto</a>
+        <a href="#acoes">Ações</a>
+        <a href="#monitoramento">Monitoramento</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+
+    <!-- ===================== SEÇÃO 1 — HERO ===================== -->
+    <header class="hero" id="topo">
+      <div class="hero-top">
+        <div class="hero-eyebrow">Relatório de Análise · Carteira Digital</div>
+        <span class="hero-badge"><span class="pulse"></span>Volume crítico detectado</span>
+      </div>
+
+      <h1>Status Repasse<br>Análise Acumulativa — Maio a Junho 2026</h1>
+
+      <p class="hero-desc">
+        Diagnóstico de causas raiz do aumento de <b>+132%</b> em chamados de "Status Repasse"
+        após o lançamento da Carteira Digital, com <b>ações propostas</b> para o time de Produto e Tecnologia.
+      </p>
+
+      <div class="hero-meta">
+        <span class="hero-chip"><span class="ic">📅</span> Período: <b>18 mai – 12 jun 2026</b></span>
+        <span class="hero-chip"><span class="ic">💬</span> Conversas analisadas: <b>162</b> (143 mai + 19 jun)</span>
+        <span class="hero-chip"><span class="ic">🗄️</span> Fonte: <b>Intercom</b></span>
+        <span class="hero-chip"><span class="ic">👤</span> Analista: <b>CS N2 · Carteira Digital</b></span>
+      </div>
+    </header>
+
+    <!-- ===================== SEÇÃO 2 — KPIs ===================== -->
+    <section class="section" id="kpis">
+      <div class="section-head reveal">
+        <span class="eyebrow">Seção 2 · Visão geral</span>
+        <h2>Métricas em Destaque</h2>
+        <p class="section-sub">Comparativo Maio × Junho de 2026 — dados quantitativos do Intercom.</p>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi is-alert reveal">
+          <div class="kpi-top">
+            <span class="kpi-label">Chamados "Status Repasse"</span>
+            <span class="kpi-ic">📈</span>
+          </div>
+          <div class="kpi-value" data-count="232">0</div>
+          <span class="kpi-delta up">↑ +132% vs. maio</span>
+          <div class="kpi-sub">Maio: 100 · Junho (até 12/06): 232</div>
+        </div>
+
+        <div class="kpi reveal">
+          <div class="kpi-top">
+            <span class="kpi-label">Volume geral "Repasse"</span>
+            <span class="kpi-ic">📊</span>
+          </div>
+          <div class="kpi-value" data-count="416">0</div>
+          <span class="kpi-delta up">↑ +35% vs. maio</span>
+          <div class="kpi-sub">Maio: 308 · Junho (até 12/06): 416</div>
+        </div>
+
+        <div class="kpi reveal">
+          <div class="kpi-top">
+            <span class="kpi-label">Conversas analisadas</span>
+            <span class="kpi-ic">🔍</span>
+          </div>
+          <div class="kpi-value" data-count="162">0</div>
+          <span class="kpi-delta flat">Total acumulado</span>
+          <div class="kpi-sub">Junho: 19 · Maio: 143</div>
+        </div>
+
+        <div class="kpi is-good reveal">
+          <div class="kpi-top">
+            <span class="kpi-label">Tempo médio (repasse)</span>
+            <span class="kpi-ic">⏱️</span>
+          </div>
+          <div class="kpi-value" style="font-size:2.1rem">2h 3m</div>
+          <span class="kpi-delta down">↓ −32m 16s vs. anterior</span>
+          <div class="kpi-sub">~70–80% poderiam ser autoatendimento</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SEÇÃO 3 — DIAGNÓSTICO ===================== -->
+    <section class="section" id="diagnostico">
+      <div class="section-head reveal">
+        <span class="eyebrow">Seção 3 · O problema</span>
+        <h2>Diagnóstico</h2>
+        <p class="section-sub">Como o volume evoluiu, onde se concentra e por que os integradores continuam acionando o suporte.</p>
+      </div>
+
+      <!-- 3.1 Evolução -->
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">3.1</span> Evolução de "Status Repasse" (Maio → Junho)</h3>
+        <p class="card-desc">
+          Salto de <b>100 → 232 chamados</b> em menos de um mês. O lançamento da Carteira Digital
+          gerou o efeito oposto ao esperado.
+        </p>
+        <div class="chart-box"><canvas id="chartEvolucao"></canvas></div>
+      </div>
+
+      <!-- 3.2 Distribuição comparativa -->
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">3.2</span> Distribuição Comparativa de Categorias</h3>
+        <div class="two-col" style="margin-top:18px;">
+          <div>
+            <div class="chart-box sm"><canvas id="chartMaio"></canvas></div>
+            <p style="text-align:center;font-size:.8rem;color:var(--cinza-suave);margin-top:8px;">Maio — 143 conversas</p>
+          </div>
+          <div>
+            <div class="chart-box sm"><canvas id="chartJunho"></canvas></div>
+            <p style="text-align:center;font-size:.8rem;color:var(--cinza-suave);margin-top:8px;">Junho — 19 conversas</p>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="dist-table">
+            <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Maio</th>
+                <th style="min-width:110px;">Distribuição</th>
+                <th>Junho</th>
+                <th style="min-width:110px;">Distribuição</th>
+                <th>Variação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="dist-cat">Consulta de status / confirmação de prazo</td>
+                <td class="dist-num">65%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="81"></div></div></td>
+                <td class="dist-num">78.9%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="100"></div></div></td>
+                <td><span class="pill up">↑ +21%</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">NF rejeitada sem feedback claro</td>
+                <td class="dist-num">7%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="9"></div></div></td>
+                <td class="dist-num">5.3%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="7"></div></div></td>
+                <td><span class="pill down">↓ −2%</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">Requisitos da 2ª parcela desconhecidos</td>
+                <td class="dist-num">6%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="8"></div></div></td>
+                <td class="dist-num">5.3%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="7"></div></div></td>
+                <td><span class="pill down">↓ −1%</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">Carteira Digital não mostra informações</td>
+                <td class="dist-num">5%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="6"></div></div></td>
+                <td class="dist-num">0%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="0"></div></div></td>
+                <td><span class="pill ok">✓ Resolvido</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">Repasse agendado mas não recebido</td>
+                <td class="dist-num">12%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="15"></div></div></td>
+                <td class="dist-num">—</td>
+                <td><span style="font-size:.8rem;color:var(--cinza-suave)">sem registro</span></td>
+                <td><span class="pill na">Sem dados jun.</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">Problemas técnicos com envio de NF</td>
+                <td class="dist-num">3%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="4"></div></div></td>
+                <td class="dist-num">5.3%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="7"></div></div></td>
+                <td><span class="pill up">↑ +2%</span></td>
+              </tr>
+              <tr>
+                <td class="dist-cat">Outros</td>
+                <td class="dist-num">7%</td>
+                <td><div class="bar-track"><div class="bar-fill mai" data-w="9"></div></div></td>
+                <td class="dist-num">5.3%</td>
+                <td><div class="bar-track"><div class="bar-fill jun" data-w="7"></div></div></td>
+                <td><span class="pill down">↓ −2%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3.3 Shift -->
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">3.3</span> O Shift de Comportamento</h3>
+        <div class="shift-grid">
+          <div class="shift mai">
+            <div class="shift-tag">Maio 2026</div>
+            <div class="shift-quote">"Cliente não conhecia a Carteira Digital"</div>
+            <ul>
+              <li>Integrador <b>não usa</b> a ferramenta</li>
+              <li><b>88%</b> não conhecem ou não usam</li>
+              <li>Prefere contato humano por hábito</li>
+              <li>Comportamento: ligar antes de acessar</li>
+            </ul>
+          </div>
+          <div class="shift-arrow">
+            <div class="circle">→</div>
+            <div class="lbl">O Shift</div>
+          </div>
+          <div class="shift jun">
+            <div class="shift-tag">Junho 2026</div>
+            <div class="shift-quote">"Cliente conhece, mas não confia"</div>
+            <ul>
+              <li>Integrador <b>usa</b>, mas não acredita nos dados</li>
+              <li><b>78.9%</b> pedem "confirmação" com dados disponíveis</li>
+              <li>Suporte = "garantia oficial"</li>
+              <li>Comportamento: confirmar o que a Carteira já mostra</li>
+            </ul>
+          </div>
+        </div>
+        <div class="insight">
+          <span class="ic">💡</span>
+          <p><b>Implicação para o Produto:</b> a solução mudou. De <em>educação</em> (ensinar a usar)
+          para <em>confiança</em> (tornar a ferramenta confiável o suficiente para que o integrador não precise confirmar com humanos).</p>
+        </div>
+      </div>
+
+      <!-- 3.4 Hipóteses -->
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">3.4</span> Hipóteses de Causa Raiz</h3>
+        <div class="hyp-grid">
+          <div class="hyp">
+            <div class="hyp-head">
+              <span class="hyp-badge">01</span>
+              <h3>Falta de confiança como fonte autoritativa</h3>
+            </div>
+            <ul>
+              <li><b>78.9%</b> das conversas são pedidos de "confirmação"</li>
+              <li>Histórico de datas adiadas e pagamentos não recebidos</li>
+              <li>Resultado: contato com suporte = "garantia"</li>
+            </ul>
+          </div>
+          <div class="hyp">
+            <div class="hyp-head">
+              <span class="hyp-badge">02</span>
+              <h3>Carteira não mostra etapas de bloqueio</h3>
+            </div>
+            <ul>
+              <li>Integrador não vê "Validação SN" ou "Análise engenharia"</li>
+              <li>Fica confuso se está travado ou em progresso</li>
+              <li>Resultado: dúvida = contato com suporte</li>
+            </ul>
+          </div>
+          <div class="hyp">
+            <div class="hyp-head">
+              <span class="hyp-badge">03</span>
+              <h3>Feedback visual de confirmação ausente</h3>
+            </div>
+            <ul>
+              <li>Upload rejeitado sem motivo específico</li>
+              <li>Não sabe se o arquivo foi recebido</li>
+              <li>Resultado: reenvios repetidos ou contato com suporte</li>
+            </ul>
+          </div>
+          <div class="hyp">
+            <div class="hyp-head">
+              <span class="hyp-badge">04</span>
+              <h3>Experiência prévia negativa consolidada</h3>
+            </div>
+            <ul>
+              <li><b>5–8 bugs</b> identificados no rollout da Carteira</li>
+              <li>Integradores já foram surpreendidos antes</li>
+              <li>Resultado: hábito de contatar suporte formou-se</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SEÇÃO 4 — IMPACTO ===================== -->
+    <section class="section" id="impacto">
+      <div class="section-head reveal">
+        <span class="eyebrow">Seção 4 · A voz do cliente</span>
+        <h2>Impacto — Relatos Reais dos Clientes</h2>
+        <p class="section-sub">Filtre por categoria ou busque por termos. Cada caso reflete uma conversa real registrada no Intercom.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">4.1</span> Casos Críticos</h3>
+
+        <div class="filters">
+          <div class="chips" id="caseChips">
+            <button class="chip active" data-filter="all">Todos</button>
+            <button class="chip" data-filter="bug">Bug na Carteira</button>
+            <button class="chip" data-filter="conf">Falta de confiança</button>
+            <button class="chip" data-filter="nf">Feedback inadequado</button>
+            <button class="chip" data-filter="com">Falta de comunicação</button>
+            <button class="chip" data-filter="sla">Falta de SLA</button>
+          </div>
+          <div class="search-box">
+            <input type="text" id="caseSearch" placeholder="Buscar nos relatos…" aria-label="Buscar casos">
+          </div>
+        </div>
+
+        <div class="cases" id="caseList">
+          <article class="case" data-cat="bug" data-text="joão victor 87071 não está aparecendo nada carteira valor repasse bug">
+            <div><span class="case-mark">A</span></div>
+            <div>
+              <div class="case-head">
+                <span class="case-name">João Victor</span>
+                <span class="case-id">· Pedido 87071</span>
+                <span class="tag bug">Bug na Carteira</span>
+              </div>
+              <div class="case-quote">"Não está aparecendo nada na minha carteira. Nenhum valor. Mesmo que ainda não esteja liberado para colocar a nota de repasse."</div>
+              <p class="case-impact"><b>Impacto:</b> usuário não consegue acessar nenhum dado — a ferramenta falhou completamente.</p>
+            </div>
+          </article>
+
+          <article class="case" data-cat="conf" data-text="jhony rocha 48571 repasse agendado pagar hoje não caiu agoniado credores confiança">
+            <div><span class="case-mark">B</span></div>
+            <div>
+              <div class="case-head">
+                <span class="case-name">Jhony Rocha</span>
+                <span class="case-id">· Pedido 48571</span>
+                <span class="tag conf">Falta de confiança</span>
+              </div>
+              <div class="case-quote">"Meu repasse está agendado para pagar hoje. Mas ainda não caiu. E eu já estou agoniado porque já tive várias situações referente a esse repasse. Se tá agendado pra hoje poderia agilizar porque meus credores estão no meu pé."</div>
+              <p class="case-impact"><b>Impacto:</b> histórico de falhas quebrou a confiança — o suporte virou confirmação humana.</p>
+            </div>
+          </article>
+
+          <article class="case" data-cat="nf" data-text="gold world solar 90261 quinta vez envio nota inversor recusado nf datalogger feedback">
+            <div><span class="case-mark">C</span></div>
+            <div>
+              <div class="case-head">
+                <span class="case-name">Gold World Solar</span>
+                <span class="case-id">· Pedido 90261</span>
+                <span class="tag nf">Feedback inadequado</span>
+              </div>
+              <div class="case-quote">"Já deve ser a quinta vez, Leticia, que faço o envio da nota do inversor. E dá recusado."</div>
+              <p class="case-impact"><b>Impacto:</b> 5 tentativas frustradas — a plataforma rejeitava sem dizer o que faltava (foto do datalogger).</p>
+            </div>
+          </article>
+
+          <article class="case" data-cat="com" data-text="josafá 215474397887641 repasse agendado mudou status data adiada comunicação aviso">
+            <div><span class="case-mark">D</span></div>
+            <div>
+              <div class="case-head">
+                <span class="case-name">Josafá</span>
+                <span class="case-id">· Conv. 215474397887641</span>
+                <span class="tag com">Falta de comunicação</span>
+              </div>
+              <div class="case-quote">"Um repasse que constava como agendado para aquele dia havia mudado de status, e outro que deveria ter sido recebido no dia anterior estava com data adiada."</div>
+              <p class="case-impact"><b>Impacto:</b> mudança sem aviso causou frustração — o sistema adiou sem notificar o integrador.</p>
+            </div>
+          </article>
+
+          <article class="case" data-cat="sla" data-text="pedido 29987 215474457864945 procedimentos link 7 dias repasse não liberado sla prazo">
+            <div><span class="case-mark">E</span></div>
+            <div>
+              <div class="case-head">
+                <span class="case-name">Pedido 29987</span>
+                <span class="case-id">· Conv. 215474457864945</span>
+                <span class="tag sla">Falta de SLA claro</span>
+              </div>
+              <div class="case-quote">"Já havia feito todos os procedimentos pelo link há mais de 7 dias e o repasse ainda não havia sido liberado."</div>
+              <p class="case-impact"><b>Impacto:</b> desconhece o prazo de processamento — completou tudo mas não sabia quando esperar.</p>
+            </div>
+          </article>
+        </div>
+
+        <div class="empty-state" id="caseEmpty">Nenhum caso encontrado para esse filtro ou busca.</div>
+      </div>
+
+      <!-- 4.2 Impacto no CS -->
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">4.2</span> Impacto no CS</h3>
+        <div class="impact-grid">
+          <div class="impact">
+            <div class="impact-val">2h 3m</div>
+            <div class="impact-desc">Tempo médio gasto em chamados de "Status Repasse"</div>
+          </div>
+          <div class="impact">
+            <div class="impact-val">~75%</div>
+            <div class="impact-desc">Estimativa de chamados que poderiam ser autoatendimento</div>
+          </div>
+          <div class="impact">
+            <div class="impact-val">232</div>
+            <div class="impact-desc">Chamados em junho (até 12/06) — +132% vs. maio</div>
+          </div>
+          <div class="impact">
+            <div class="impact-val">162</div>
+            <div class="impact-desc">Conversas qualitativas analisadas neste relatório</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SEÇÃO 5 — AÇÕES ===================== -->
+    <section class="section" id="acoes">
+      <div class="section-head reveal">
+        <span class="eyebrow">Seção 5 · Recomendações</span>
+        <h2>Ações Propostas para o Produto</h2>
+        <p class="section-sub">Priorizadas por impacto esperado na redução de chamados e esforço de implementação.</p>
+        <div class="legend">
+          <span><span class="dot alta"></span> Alta prioridade</span>
+          <span><span class="dot media"></span> Média prioridade</span>
+          <span><span class="dot baixa"></span> Baixa prioridade</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="action alta reveal">
+          <div class="action-side">
+            <span class="prio"><span class="dot alta"></span>Alta</span>
+            <span class="action-code">A1</span>
+          </div>
+          <div>
+            <h3>Timeline visual do funil de repasse na Carteira Digital</h3>
+            <p>Mostrar todas as etapas do processo (NF Recebida → Validação SN → Análise Engenharia → Repasse Aprovado → Enviado). O integrador sabe exatamente onde está e se está travado ou em progresso.</p>
+            <div class="action-meta">
+              <span class="meta-tag">Resolve: falta de visibilidade das etapas internas</span>
+              <span class="meta-tag impact">Impacto: −60–70% em contatos de "status"</span>
+              <span class="meta-tag effort">Esforço: Médio</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action alta reveal">
+          <div class="action-side">
+            <span class="prio"><span class="dot alta"></span>Alta</span>
+            <span class="action-code">A2</span>
+          </div>
+          <div>
+            <h3>"Por que meu repasse está aguardando?" — Motivo específico + CTA</h3>
+            <p>Adicionar seção na Carteira com o motivo específico do bloqueio e uma chamada para ação clara (ex.: "⏹ Aguardando envio de SN", "⏳ Análise de engenharia — prazo: 3 dias úteis").</p>
+            <div class="action-meta">
+              <span class="meta-tag">Resolve: 78.9% que pedem "confirmação"</span>
+              <span class="meta-tag impact">Impacto: −30% em escalações</span>
+              <span class="meta-tag effort">Esforço: Médio</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action alta reveal">
+          <div class="action-side">
+            <span class="prio"><span class="dot alta"></span>Alta</span>
+            <span class="action-code">A3</span>
+          </div>
+          <div>
+            <h3>Validação visual de upload — Checkmark imediato + motivo se rejeitado</h3>
+            <p>Exibir confirmação visual imediata quando o arquivo é recebido. Se rejeitado, mostrar o motivo específico ("Falta: foto do datalogger") em vez de mensagem genérica.</p>
+            <div class="action-meta">
+              <span class="meta-tag">Resolve: caso Gold World Solar (5 tentativas)</span>
+              <span class="meta-tag impact">Impacto: 100% das dúvidas de upload eliminadas</span>
+              <span class="meta-tag effort">Esforço: Pequeno</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action media reveal">
+          <div class="action-side">
+            <span class="prio"><span class="dot media"></span>Média</span>
+            <span class="action-code">B1</span>
+          </div>
+          <div>
+            <h3>Notificações proativas — Email/SMS quando o status muda</h3>
+            <p>Notificar o integrador quando o repasse é aprovado, rejeitado, entra em análise ou tem a data alterada. Elimina o contato reativo de quem fica esperando sem saber o que aconteceu.</p>
+            <div class="action-meta">
+              <span class="meta-tag">Resolve: casos de repasse adiado sem aviso</span>
+              <span class="meta-tag impact">Impacto: −20–30% em contatos reativos</span>
+              <span class="meta-tag effort">Esforço: Pequeno</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action baixa reveal">
+          <div class="action-side">
+            <span class="prio"><span class="dot baixa"></span>Baixa</span>
+            <span class="action-code">C1</span>
+          </div>
+          <div>
+            <h3>Tutorial in-app + email educativo "Como acompanhar seu repasse"</h3>
+            <p>Tutorial guiado no primeiro login + email explicando os passos da 2ª parcela assim que a instalação é marcada como concluída.</p>
+            <div class="action-meta">
+              <span class="meta-tag">Resolve: requisitos da 2ª parcela desconhecidos</span>
+              <span class="meta-tag impact">Impacto: mudança de comportamento gradual</span>
+              <span class="meta-tag effort">Esforço: Pequeno</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mockup UX A2 -->
+      <div class="mockup-wrap reveal">
+        <div class="mockup-label">🎨 Exemplo de UX — Ação A2: "Por que está aguardando?"</div>
+        <div class="mockup">
+          <div class="mockup-title">Por que meu repasse está aguardando?</div>
+          <div class="mockup-status">⏹ Status: Aguardando envio de SN</div>
+          <div class="mockup-falta">
+            <b>O que falta:</b>
+            <ul>
+              <li>Foto do SN do inversor (obrigatório)</li>
+              <li>Datalogger (opcional mas recomendado)</li>
+            </ul>
+          </div>
+          <a class="mockup-cta" href="#">Enviar SN agora →</a>
+          <div class="mockup-prazo">⏱ Prazo esperado após o envio: 2–3 dias úteis</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SEÇÃO 6 — MONITORAMENTO ===================== -->
+    <section class="section" id="monitoramento">
+      <div class="section-head reveal">
+        <span class="eyebrow">Seção 6 · Próximos passos</span>
+        <h2>Monitoramento</h2>
+        <p class="section-sub">Métricas a acompanhar para validar o efeito das ações implementadas.</p>
+      </div>
+
+      <div class="card reveal">
+        <h3 class="card-title"><span class="num">6.1</span> Métricas a Acompanhar</h3>
+        <div class="monit-grid">
+          <div class="monit">
+            <div class="monit-name">Volume "Status Repasse"</div>
+            <div class="monit-goal">🎯 Meta: manter ou cair</div>
+            <div class="monit-now">Atual: 232 (jun) · Ref: 100 (mai)</div>
+          </div>
+          <div class="monit">
+            <div class="monit-name">% consultas de "confirmação"</div>
+            <div class="monit-goal">🎯 Meta: cair abaixo de 50%</div>
+            <div class="monit-now">Atual: 78.9% (jun) · 65% (mai)</div>
+          </div>
+          <div class="monit">
+            <div class="monit-name">Tempo médio de atendimento</div>
+            <div class="monit-goal">🎯 Meta: cair com o volume</div>
+            <div class="monit-now">Atual: 2h 3m · Ref: 2h 35m</div>
+          </div>
+          <div class="monit">
+            <div class="monit-name">% NF rejeitada repetida</div>
+            <div class="monit-goal">🎯 Meta: cair para &lt; 3%</div>
+            <div class="monit-now">Atual: ~7% (mai) · 5.3% (jun)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="next reveal">
+        <div>
+          <h3>📅 Próxima Análise Bi-semanal</h3>
+          <p>Objetivo: validar se o volume de "Status Repasse" caiu após a implantação das ações A2 e A3.</p>
+        </div>
+        <div class="next-date">
+          <div class="lbl">Prevista para</div>
+          <div class="val">27 jun 2026</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== RODAPÉ ===================== -->
+    <footer class="footer">
+      <p>Relatório gerado em <b>16 de junho de 2026</b> · Dados: Intercom exportado em 15/06/2026 · Análise: <b>CS N2 — Carteira Digital · 77Sol</b></p>
+      <p class="meta2">Atualização bi-semanal prevista · Baseado em 162 conversas qualitativas (143 maio + 19 junho)</p>
+    </footer>
+
+  </div><!-- /wrap -->
+
+  <button class="to-top" id="toTop" aria-label="Voltar ao topo">↑</button>
+
+  <!-- ============================================================
+       JAVASCRIPT — DADOS + GRÁFICOS + INTERATIVIDADE
+       Para atualizar o relatório, edite apenas o objeto `dados` abaixo.
+       ============================================================ -->
+  <script>
+    // ============================================================
+    // DADOS DINÂMICOS — atualize aqui a cada 15 dias
+    // ============================================================
+    const dados = {
+      dataAnalise: "16 de junho de 2026",
+      periodo: "18 maio – 12 junho de 2026",
+
+      kpis: {
+        statusRepasse: { maio: 100, junho: 232, variacaoPerc: 132 },
+        repasse:       { maio: 308, junho: 416, variacaoPerc: 35  },
+        conversas:     { maio: 143, junho: 19,  total: 162 },
+        tempoMedio:    "2h 3m",
+        variacaoTempo: "−32m 16s"
+      },
+
+      // Evolução semanal (distribuição ilustrativa do total)
+      evolucao: {
+        labels:     ["Mai 18–24", "Mai 25–31", "Jun 1–7", "Jun 8–12"],
+        junho:      [22, 35, 48, 127],   // soma ≈ 232
+        referencia: [25, 28, 27, 20]     // maio distribuído p/ referência
+      },
+
+      // Distribuição qualitativa (% das conversas)
+      distribuicao: {
+        maio: {
+          labels:  ["Consulta status", "Agendado não recebido", "NF rejeitada", "Req. 2ª parcela", "Carteira não mostra", "Prob. NF", "Outros"],
+          valores: [65, 12, 7, 6, 5, 3, 7]
+        },
+        junho: {
+          labels:  ["Consulta status", "Req. 2ª parcela", "Bug Carteira", "Prob. NF", "Outros"],
+          valores: [78.9, 5.3, 5.3, 5.3, 5.3]
+        }
+      }
+    };
+
+    // ============================================================
+    // PALETA — sincronizada com o CSS
+    // ============================================================
+    const C = {
+      azul77:'#026BFF', azulEscuro:'#060C54', azulCeleste:'#7FBFFA', azulCeu:'#C4E1FF',
+      sol:'#FBCF31', vermelho:'#E5484D', verde:'#2F9E61', laranja:'#E8870B', roxo:'#7C5CDB', cinza:'#CBD5E0'
+    };
+
+    // Defaults globais do Chart.js para visual premium
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.font.size = 12;
+    Chart.defaults.color = '#5A6781';
+
+    const tooltipStyle = {
+      backgroundColor: 'rgba(6,12,84,.95)',
+      padding: 12, cornerRadius: 10, titleColor: '#fff', bodyColor: '#C4E1FF',
+      titleFont: { weight: '700', size: 13 }, bodyFont: { size: 12 },
+      displayColors: true, boxPadding: 5, usePointStyle: true
+    };
+
+    // ============================================================
+    // GRÁFICO 1 — Evolução (barras agrupadas, animado)
+    // ============================================================
+    new Chart(document.getElementById('chartEvolucao'), {
+      type: 'bar',
+      data: {
+        labels: dados.evolucao.labels,
+        datasets: [
+          { label: 'Junho 2026', data: dados.evolucao.junho,
+            backgroundColor: (ctx)=>{ const {ctx:c}=ctx.chart; const g=c.createLinearGradient(0,0,0,300); g.addColorStop(0,'#026BFF'); g.addColorStop(1,'#7FBFFA'); return g; },
+            borderRadius: 8, borderSkipped: false, maxBarThickness: 54 },
+          { label: 'Maio 2026 (ref.)', data: dados.evolucao.referencia,
+            backgroundColor: '#C4E1FF', borderRadius: 8, borderSkipped: false, maxBarThickness: 54 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        animation: { duration: 1200, easing: 'easeOutQuart' },
+        plugins: {
+          legend: { position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'circle', padding: 16, font:{weight:'600'} } },
+          tooltip: { ...tooltipStyle, callbacks: { label: c => `  ${c.dataset.label}: ${c.parsed.y} chamados` } }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#EFF3FA' }, border:{display:false}, title: { display: true, text: 'Nº de chamados', font:{weight:'600'} } },
+          x: { grid: { display: false }, border:{display:false}, ticks:{font:{weight:'600'}} }
+        }
+      }
+    });
+
+    // ============================================================
+    // GRÁFICOS 2 e 3 — Donuts (Maio e Junho)
+    // ============================================================
+    function donut(id, d, palette) {
+      return new Chart(document.getElementById(id), {
+        type: 'doughnut',
+        data: { labels: d.labels, datasets: [{ data: d.valores, backgroundColor: palette, borderWidth: 3, borderColor: '#fff', hoverOffset: 8 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '64%',
+          animation: { animateRotate: true, duration: 1100 },
+          plugins: {
+            legend: { position: 'bottom', labels: { usePointStyle: true, pointStyle: 'circle', padding: 10, boxWidth: 8, font: { size: 10.5 } } },
+            tooltip: { ...tooltipStyle, callbacks: { label: c => `  ${c.label}: ${c.parsed}%` } }
+          }
+        }
+      });
+    }
+
+    donut('chartMaio', dados.distribuicao.maio,
+      [C.azul77, C.azulEscuro, C.laranja, C.azulCeleste, C.vermelho, C.roxo, C.cinza]);
+    donut('chartJunho', dados.distribuicao.junho,
+      [C.azul77, C.azulCeleste, C.vermelho, C.laranja, C.cinza]);
+
+    // ============================================================
+    // CONTADORES ANIMADOS DOS KPIs
+    // ============================================================
+    function animateCount(el) {
+      const target = +el.dataset.count;
+      const dur = 1400, start = performance.now();
+      function step(now) {
+        const p = Math.min((now - start) / dur, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(target * eased).toLocaleString('pt-BR');
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // ============================================================
+    // REVEAL ON SCROLL + animações disparadas por visibilidade
+    // ============================================================
+    function revealElement(el) {
+      if (el.classList.contains('in')) return;
+      el.classList.add('in');
+      el.querySelectorAll('.kpi-value[data-count]').forEach(kpi => {
+        if (!kpi.dataset.done) { kpi.dataset.done = '1'; animateCount(kpi); }
+      });
+      el.querySelectorAll('.bar-fill[data-w]').forEach(bar => {
+        bar.style.width = bar.dataset.w + '%';
+      });
+    }
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        revealElement(e.target);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.05, rootMargin: '0px 0px 60px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Fallback: revela imediatamente elementos já visíveis na tela ao carregar
+    requestAnimationFrame(() => {
+      document.querySelectorAll('.reveal').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight + 60) revealElement(el);
+      });
+    });
+
+    // ============================================================
+    // FILTRO + BUSCA NA TABELA DE CASOS
+    // ============================================================
+    const chips = document.querySelectorAll('#caseChips .chip');
+    const search = document.getElementById('caseSearch');
+    const cases = Array.from(document.querySelectorAll('#caseList .case'));
+    const emptyState = document.getElementById('caseEmpty');
+    let activeFilter = 'all';
+
+    function applyFilter() {
+      const q = search.value.trim().toLowerCase();
+      let visible = 0;
+      cases.forEach(card => {
+        const matchCat = activeFilter === 'all' || card.dataset.cat === activeFilter;
+        const matchText = !q || card.dataset.text.includes(q) || card.textContent.toLowerCase().includes(q);
+        const show = matchCat && matchText;
+        card.classList.toggle('hide', !show);
+        if (show) visible++;
+      });
+      emptyState.classList.toggle('show', visible === 0);
+    }
+
+    chips.forEach(chip => chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      activeFilter = chip.dataset.filter;
+      applyFilter();
+    }));
+    search.addEventListener('input', applyFilter);
+
+    // ============================================================
+    // NAVEGAÇÃO: scroll-spy + barra de progresso + menu mobile
+    // ============================================================
+    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = Array.from(navLinks).map(a => document.querySelector(a.getAttribute('href')));
+    const progressBar = document.getElementById('progressBar');
+    const toTop = document.getElementById('toTop');
+
+    function onScroll() {
+      const st = window.scrollY;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (st / h * 100) + '%';
+      toTop.classList.toggle('show', st > 600);
+
+      let current = '';
+      sections.forEach(sec => { if (sec && sec.offsetTop - 120 <= st) current = '#' + sec.id; });
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === current));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // Menu mobile
+    const navToggle = document.getElementById('navToggle');
+    const navMenu = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => navMenu.classList.toggle('open'));
+    navMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => navMenu.classList.remove('open')));
+  </script>
+</body>
+</html>
